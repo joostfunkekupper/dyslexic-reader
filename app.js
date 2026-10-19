@@ -279,6 +279,15 @@ function levelDots(level) {
   return dots;
 }
 
+// A trophy marking a book the reader has finished.
+function trophy() {
+  const span = document.createElement("span");
+  span.className = "trophy";
+  span.title = "Finished";
+  span.innerHTML = `<svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3"/><path d="M12 14v3M9 20h6M10 17h4"/></svg><span class="sr-only">Finished</span>`;
+  return span;
+}
+
 function bookCard(book) {
   const li = document.createElement("li");
   const a = document.createElement("a");
@@ -289,14 +298,16 @@ function bookCard(book) {
 
   const meta = document.createElement("span");
   meta.className = "book-meta";
-  const parts = [];
-  if (book.words) parts.push(`${book.words} words`);
+  const words = book.words ? `${book.words} words` : "";
   const pos = store.get("progress:" + book.slug, null);
-  if (pos && pos.total) {
+  if (pos && pos.total && pos.end) {
+    meta.append(words, trophy());
+  } else if (pos && pos.total) {
     const pct = Math.min(99, Math.round(((pos.index + 1) / pos.total) * 100));
-    parts.push(pos.end ? "Finished" : `${pct}% read`);
+    meta.append([words, `${pct}% read`].filter(Boolean).join(" · "));
+  } else {
+    meta.append(words);
   }
-  meta.textContent = parts.join(" · ");
 
   a.append(name, meta);
   li.append(a);
