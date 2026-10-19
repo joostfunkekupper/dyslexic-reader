@@ -23,6 +23,7 @@ const settings = {
   spp: store.get("spp", 3),
   lh: store.get("lh", 1.8),
   width: store.get("width", "medium"),
+  hyphens: store.get("hyphens", false) === true,
 };
 
 // Fixed column widths, independent of text size (bigger text wraps onto more lines); null = whole window.
@@ -34,6 +35,7 @@ function applyReadingVars() {
   root.setProperty("--reading-size", settings.size + "px");
   root.setProperty("--reading-lh", String(settings.lh));
   root.setProperty("--column-width", WIDTHS[settings.width] ?? "none");
+  document.documentElement.classList.toggle("hyphenate", settings.hyphens);
 }
 applyReadingVars();
 
@@ -80,6 +82,14 @@ for (const radio of document.querySelectorAll('#width input[name="width"]')) {
     applyReadingVars();
   });
 }
+
+const hyphensToggle = document.getElementById("hyphens");
+hyphensToggle.checked = settings.hyphens;
+hyphensToggle.addEventListener("change", () => {
+  settings.hyphens = hyphensToggle.checked;
+  store.set("hyphens", settings.hyphens);
+  applyReadingVars();
+});
 
 function bindSlider(key, format, onChange) {
   const input = document.getElementById(key);
