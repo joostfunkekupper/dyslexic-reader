@@ -24,6 +24,10 @@ More text...
 
 Supported: paragraphs, `##` headings, `---` scene breaks, `*italic*` and `**bold**`.
 
+Each book gets a reading level (1 First words, 2 Early reader, 3 Growing reader) worked out from its
+text: longer words, longer sentences and more 7+ letter words push it up a level. The book list groups
+books by level, easiest first. See `readingLevel()` in `scripts/build-manifest.mjs` to adjust it.
+
 Push to `main` and GitHub Actions rebuilds the book list and deploys to GitHub Pages.
 
 ## Running locally

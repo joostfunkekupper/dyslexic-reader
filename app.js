@@ -251,24 +251,56 @@ async function renderLibrary() {
     return;
   }
 
-  for (const book of books) {
-    const li = document.createElement("li");
-    const a = document.createElement("a");
-    a.href = "#/read/" + encodeURIComponent(book.slug);
-    const name = document.createElement("span");
-    name.textContent = book.title;
-    a.append(name);
-    const pos = store.get("progress:" + book.slug, null);
-    if (pos && pos.total) {
-      const pct = Math.min(100, Math.round(((pos.index + 1) / pos.total) * 100));
-      const prog = document.createElement("span");
-      prog.className = "progress";
-      prog.textContent = pct >= 100 ? "Finished" : `${pct}% read`;
-      a.append(prog);
+  // Group by reading level, easiest first (the manifest is already sorted).
+  for (const level of [...new Set(books.map((b) => b.level ?? 0))].sort((a, b) => (a || 99) - (b || 99))) {
+    const section = document.createElement("section");
+    const info = LEVELS[level];
+    const heading = document.createElement("h2");
+    heading.className = "level-heading";
+    if (info) {
+      heading.append(levelDots(level), ` Level ${level} · ${info}`);
+    } else {
+      heading.textContent = "Other books";
     }
-    li.append(a);
-    list.append(li);
+    const ul = document.createElement("ul");
+    for (const book of books.filter((b) => (b.level ?? 0) === level)) ul.append(bookCard(book));
+    section.append(heading, ul);
+    list.append(section);
   }
+}
+
+const LEVELS = { 1: "First words", 2: "Early reader", 3: "Growing reader" };
+
+function levelDots(level) {
+  const dots = document.createElement("span");
+  dots.className = "level-dots";
+  dots.setAttribute("aria-hidden", "true");
+  dots.textContent = "●".repeat(level) + "○".repeat(3 - level);
+  return dots;
+}
+
+function bookCard(book) {
+  const li = document.createElement("li");
+  const a = document.createElement("a");
+  a.href = "#/read/" + encodeURIComponent(book.slug);
+  const name = document.createElement("span");
+  name.className = "book-name";
+  name.textContent = book.title;
+
+  const meta = document.createElement("span");
+  meta.className = "book-meta";
+  const parts = [];
+  if (book.words) parts.push(`${book.words} words`);
+  const pos = store.get("progress:" + book.slug, null);
+  if (pos && pos.total) {
+    const pct = Math.min(100, Math.round(((pos.index + 1) / pos.total) * 100));
+    parts.push(pct >= 100 ? "Finished" : `${pct}% read`);
+  }
+  meta.textContent = parts.join(" · ");
+
+  a.append(name, meta);
+  li.append(a);
+  return li;
 }
 
 // ---------- Reader ----------

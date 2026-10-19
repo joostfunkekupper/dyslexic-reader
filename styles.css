@@ -135,12 +135,26 @@ main:focus { outline: none; }
 /* Library */
 .library { max-width: 52rem; margin: 0 auto; }
 .library h1 { font-size: 1.6rem; margin: 0.5rem 0 1.25rem; }
-.book-list {
+.book-list { display: grid; gap: 2rem; }
+.book-list ul {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
   gap: 0.75rem;
+}
+.level-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.05rem;
+  margin: 0 0 0.75rem;
+}
+.level-dots {
+  flex: none;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+  font-family: system-ui, sans-serif;
 }
 .book-list a {
   display: flex;
@@ -156,10 +170,13 @@ main:focus { outline: none; }
   font-size: 1.15rem;
 }
 .book-list a:hover { border-color: var(--accent); }
-.book-list .progress {
+.book-meta {
   color: var(--muted);
   font-size: 0.85rem;
   white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .book-list a { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
 }
 .message { color: var(--muted); }
 
