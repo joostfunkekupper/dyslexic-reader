@@ -198,9 +198,16 @@ main:focus { outline: none; }
 
 .settings {
   position: fixed;
-  inset: 4.5rem 16px auto auto;
+  top: 4.5rem;
+  right: 16px;
+  bottom: auto;
+  left: auto;
   margin: 0;
   width: min(22rem, calc(100vw - 32px));
+  /* Safari's default popover sizing otherwise stretches the panel to the full window height. */
+  height: auto;
+  max-height: calc(100dvh - 5.5rem);
+  overflow-y: auto;
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
@@ -208,7 +215,7 @@ main:focus { outline: none; }
   padding: 1rem;
   box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
 }
-.settings:popover-open { display: grid; gap: 1rem; }
+.settings:popover-open { display: grid; gap: 1rem; align-content: start; }
 .settings h2 { font-size: 1rem; margin: 0; }
 .setting {
   display: grid;
