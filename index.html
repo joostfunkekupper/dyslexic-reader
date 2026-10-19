@@ -20,6 +20,10 @@
 <body>
   <header class="topbar">
     <a class="brand" href="#/">Dyslexic Reader</a>
+    <div class="book-nav" hidden>
+      <a class="icon-btn back" href="#/" aria-label="Back to books" title="Back to books"><span aria-hidden="true">←</span></a>
+      <h1 class="book-title"></h1>
+    </div>
     <div class="toolbar">
       <button id="settings-toggle" class="icon-btn" type="button" popovertarget="settings-panel"
         aria-label="Reading settings" title="Reading settings" hidden>
@@ -67,11 +71,6 @@
 
   <template id="reader-tpl">
     <section class="reader">
-      <div class="reader-head">
-        <a class="back" href="#/">← Books</a>
-        <h1 class="book-title"></h1>
-      </div>
-
       <article class="page" aria-live="polite"></article>
 
       <nav class="pager" aria-label="Pages">

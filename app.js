@@ -40,6 +40,9 @@ applyReadingVars();
 // ---------- Reading settings panel (in the toolbar, shown while reading) ----------
 
 const settingsBtn = document.getElementById("settings-toggle");
+const brand = document.querySelector(".brand");
+const bookNav = document.querySelector(".book-nav");
+const bookTitle = document.querySelector(".book-title");
 const settingsPanel = document.getElementById("settings-panel");
 let onSppChange = () => {};
 
@@ -248,6 +251,8 @@ function cleanupReader() {
   readerKeyHandler = null;
   onSppChange = () => {};
   settingsBtn.hidden = true;
+  bookNav.hidden = true;
+  brand.hidden = false;
   if (settingsPanel.matches(":popover-open")) settingsPanel.hidePopover();
 }
 
@@ -270,7 +275,10 @@ async function renderReader(slug) {
   }
 
   const title = book.title || book.meta.title;
-  $(".book-title").textContent = title;
+  bookTitle.textContent = title;
+  bookTitle.title = title;
+  brand.hidden = true;
+  bookNav.hidden = false;
   document.title = `${title} · Dyslexic Reader`;
 
   const total = book.sentences.length;
