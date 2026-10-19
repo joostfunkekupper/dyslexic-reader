@@ -336,7 +336,19 @@ fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
 }
 .page hr::after { content: "* * *"; color: var(--muted); }
 .page code { font-family: inherit; background: var(--surface); padding: 0 0.2em; border-radius: 4px; }
-.page .end { color: var(--muted); font-style: italic; }
+.the-end {
+  display: grid;
+  justify-items: center;
+  gap: 1.5rem;
+  padding: 3rem 0;
+  text-align: center;
+}
+.the-end p {
+  margin: 0;
+  font-size: 2em;
+  font-weight: 700;
+}
+.the-end a { font-size: 0.6em; }
 
 .pager-bar {
   border-top: 1px solid var(--border);
@@ -384,4 +396,13 @@ fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
 
 @media (max-width: 480px) {
   .pager button { padding: 0.5rem 1rem; }
+}
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
 }

@@ -293,14 +293,88 @@ function bookCard(book) {
   if (book.words) parts.push(`${book.words} words`);
   const pos = store.get("progress:" + book.slug, null);
   if (pos && pos.total) {
-    const pct = Math.min(100, Math.round(((pos.index + 1) / pos.total) * 100));
-    parts.push(pct >= 100 ? "Finished" : `${pct}% read`);
+    const pct = Math.min(99, Math.round(((pos.index + 1) / pos.total) * 100));
+    parts.push(pos.end ? "Finished" : `${pct}% read`);
   }
   meta.textContent = parts.join(" · ");
 
   a.append(name, meta);
   li.append(a);
   return li;
+}
+
+// ---------- Confetti ----------
+
+const CONFETTI_COLOURS = ["#f94144", "#f8961e", "#f9c74f", "#90be6d", "#43aa8b", "#577590", "#c77dff"];
+
+function celebrate() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  document.querySelector(".confetti")?.remove();
+
+  const canvas = document.createElement("canvas");
+  canvas.className = "confetti";
+  canvas.setAttribute("aria-hidden", "true");
+  document.body.append(canvas);
+  const ctx = canvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const w = innerWidth;
+  const h = innerHeight;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+
+  // Two bursts, from the bottom-left and bottom-right corners, aimed up and inwards.
+  const pieces = Array.from({ length: 160 }, (_, i) => {
+    const fromLeft = i % 2 === 0;
+    const angle = (fromLeft ? -60 : -120) + (Math.random() - 0.5) * 50;
+    const speed = (15 + Math.random() * 9) * Math.sqrt(h / 700);
+    return {
+      x: fromLeft ? 0 : w,
+      y: h,
+      vx: Math.cos((angle * Math.PI) / 180) * speed,
+      vy: Math.sin((angle * Math.PI) / 180) * speed,
+      sway: Math.random() * Math.PI * 2,
+      size: 6 + Math.random() * 6,
+      spin: Math.random() * Math.PI,
+      spinSpeed: (Math.random() - 0.5) * 0.3,
+      colour: CONFETTI_COLOURS[i % CONFETTI_COLOURS.length],
+      round: Math.random() < 0.3,
+    };
+  });
+
+  const start = performance.now();
+  const duration = 5000;
+  function frame(now) {
+    const t = now - start;
+    ctx.clearRect(0, 0, w, h);
+    ctx.globalAlpha = Math.max(0, Math.min(1, (duration - t) / 800));
+    for (const p of pieces) {
+      // Shoot up fast, then drift down slowly with a little side-to-side sway.
+      p.vy = Math.min(p.vy + 0.35, 1.8);
+      p.vx *= 0.97;
+      p.sway += 0.05;
+      p.x += p.vx + Math.sin(p.sway) * 0.8;
+      p.y += p.vy;
+      p.spin += p.spinSpeed;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.spin);
+      ctx.fillStyle = p.colour;
+      if (p.round) {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Scale on one axis so the paper looks like it flutters.
+        ctx.scale(1, Math.cos(p.spin * 2));
+        ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+      }
+      ctx.restore();
+    }
+    if (t < duration && canvas.isConnected) requestAnimationFrame(frame);
+    else canvas.remove();
+  }
+  requestAnimationFrame(frame);
 }
 
 // ---------- Reader ----------
@@ -345,15 +419,19 @@ async function renderReader(slug) {
   const total = book.sentences.length;
   const progressKey = "progress:" + slug;
   // Position is tracked by sentence, so changing sentences-per-page keeps your place.
-  let index = Math.min(store.get(progressKey, { index: 0 }).index || 0, Math.max(0, total - 1));
+  const saved = store.get(progressKey, { index: 0 });
+  let index = Math.min(saved.index || 0, Math.max(0, total - 1));
+  // After the text there is one extra "The end." page.
+  let atEnd = Boolean(saved.end && total);
 
-  const pageCount = () => Math.max(1, Math.ceil(total / settings.spp));
-  const currentPage = () => Math.floor(index / settings.spp);
+  const textPages = () => Math.max(1, Math.ceil(total / settings.spp));
+  const pageCount = () => textPages() + (total ? 1 : 0);
+  const currentPage = () => (atEnd ? textPages() : Math.floor(index / settings.spp));
 
   function draw({ focus = false } = {}) {
     const page = currentPage();
-    const start = page * settings.spp;
-    const slice = book.sentences.slice(start, start + settings.spp);
+    const start = Math.min(page * settings.spp, total);
+    const slice = atEnd ? [] : book.sentences.slice(start, start + settings.spp);
 
     let html = "";
     let openPara = null;
@@ -369,22 +447,26 @@ async function renderReader(slug) {
       html += s.html;
     }
     if (openPara !== null) html += "</p>";
-    if (page === pageCount() - 1) html += `<p class="end">The end.</p>`;
+    if (atEnd) html = `<div class="the-end"><p>The end.</p><a href="#/">Choose another book</a></div>`;
     if (!total) html = `<p class="message">This book is empty.</p>`;
     pageEl.innerHTML = html;
 
     prevBtn.disabled = page === 0;
     nextBtn.disabled = page >= pageCount() - 1;
     pageNum.textContent = `Page ${page + 1} of ${pageCount()}`;
-    store.set(progressKey, { index: start, total });
+    store.set(progressKey, { index: atEnd ? index : start, total, end: atEnd });
     if (focus) app.scrollTo({ top: 0 });
     updateFade();
   }
 
   function go(delta) {
-    const page = Math.min(pageCount() - 1, Math.max(0, currentPage() + delta));
-    index = page * settings.spp;
+    const before = currentPage();
+    const page = Math.min(pageCount() - 1, Math.max(0, before + delta));
+    atEnd = Boolean(total) && page === textPages();
+    if (!atEnd) index = page * settings.spp;
     draw({ focus: true });
+    // Celebrate when turning onto the "The end." page.
+    if (atEnd && page !== before) celebrate();
   }
 
   turnPage = go;
