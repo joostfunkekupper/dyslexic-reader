@@ -279,14 +279,15 @@ fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
 .pager button {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.7rem 1.1rem;
-  min-width: 6.5rem;
+  border-radius: 12px;
+  padding: 0.5rem 1.5rem;
+  display: inline-grid;
+  place-items: center;
 }
 .pager button:not(:disabled):hover { border-color: var(--accent); }
 .pager button:disabled { opacity: 0.4; cursor: default; }
 .page-num { color: var(--muted); font-size: 0.9rem; text-align: center; }
 
 @media (max-width: 480px) {
-  .pager button { min-width: 0; padding: 0.7rem 0.8rem; }
+  .pager button { padding: 0.5rem 1rem; }
 }
