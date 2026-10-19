@@ -39,6 +39,7 @@
 
   --reading-size: 24px;
   --reading-lh: 1.8;
+  --column-width: calc(var(--reading-size) * 38);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -120,6 +121,8 @@ main {
   padding: 1.5rem 16px 3rem;
 }
 main:focus { outline: none; }
+/* The reader sets its own width via --column-width, up to the full window. */
+main:has(.reader) { max-width: none; }
 
 /* Library */
 .library h1 { font-size: 1.6rem; margin: 0.5rem 0 1.25rem; }
@@ -152,6 +155,10 @@ main:focus { outline: none; }
 .message { color: var(--muted); }
 
 /* Reader */
+.reader {
+  max-width: var(--column-width);
+  margin-inline: auto;
+}
 .reader-head {
   display: flex;
   flex-direction: column;
@@ -185,6 +192,40 @@ main:focus { outline: none; }
   gap: 0.35rem;
   font-size: 0.9rem;
 }
+fieldset.setting { border: 0; margin: 0; padding: 0; min-width: 0; }
+fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.segmented label { position: relative; }
+.segmented label + label { border-left: 1px solid var(--border); }
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.segmented span {
+  display: block;
+  padding: 0.55rem 0.2rem;
+  text-align: center;
+  font-size: 0.75rem;
+  background: var(--bg);
+}
+.segmented input:checked + span {
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 700;
+}
+.segmented input:focus-visible + span {
+  outline: 3px solid var(--focus);
+  outline-offset: -3px;
+}
 .setting output { color: var(--muted); margin-left: 0.4rem; }
 .setting input[type="range"] {
   width: 100%;
@@ -195,7 +236,6 @@ main:focus { outline: none; }
 .page {
   font-size: var(--reading-size);
   line-height: var(--reading-lh);
-  max-width: 38em;
   min-height: 40vh;
   overflow-wrap: break-word;
 }

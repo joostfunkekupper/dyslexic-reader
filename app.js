@@ -22,11 +22,19 @@ const settings = {
   size: store.get("size", 24),
   spp: store.get("spp", 3),
   lh: store.get("lh", 1.8),
+  width: store.get("width", "medium"),
 };
 
+// Column widths in multiples of the text size (roughly characters per line); null = whole window.
+const WIDTHS = { narrow: 28, medium: 38, wide: 55, full: null };
+if (!(settings.width in WIDTHS)) settings.width = "medium";
+
 function applyReadingVars() {
-  document.documentElement.style.setProperty("--reading-size", settings.size + "px");
-  document.documentElement.style.setProperty("--reading-lh", String(settings.lh));
+  const root = document.documentElement.style;
+  root.setProperty("--reading-size", settings.size + "px");
+  root.setProperty("--reading-lh", String(settings.lh));
+  const n = WIDTHS[settings.width];
+  root.setProperty("--column-width", n ? `calc(var(--reading-size) * ${n})` : "none");
 }
 applyReadingVars();
 
@@ -43,6 +51,15 @@ settingsPanel.addEventListener("toggle", (e) => {
 bindSlider("size", (v) => `${v}px`, applyReadingVars);
 bindSlider("lh", (v) => v.toFixed(1), applyReadingVars);
 bindSlider("spp", (v) => String(v), () => onSppChange());
+
+for (const radio of document.querySelectorAll('#width input[name="width"]')) {
+  radio.checked = radio.value === settings.width;
+  radio.addEventListener("change", () => {
+    settings.width = radio.value;
+    store.set("width", settings.width);
+    applyReadingVars();
+  });
+}
 
 function bindSlider(key, format, onChange) {
   const input = document.getElementById(key);
