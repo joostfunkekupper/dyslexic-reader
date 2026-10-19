@@ -25,16 +25,15 @@ const settings = {
   width: store.get("width", "medium"),
 };
 
-// Column widths in multiples of the text size (roughly characters per line); null = whole window.
-const WIDTHS = { narrow: 28, medium: 38, wide: 55, full: null };
+// Fixed column widths, independent of text size (bigger text wraps onto more lines); null = whole window.
+const WIDTHS = { narrow: "40rem", medium: "52rem", wide: "72rem", full: null };
 if (!(settings.width in WIDTHS)) settings.width = "medium";
 
 function applyReadingVars() {
   const root = document.documentElement.style;
   root.setProperty("--reading-size", settings.size + "px");
   root.setProperty("--reading-lh", String(settings.lh));
-  const n = WIDTHS[settings.width];
-  root.setProperty("--column-width", n ? `calc(var(--reading-size) * ${n})` : "none");
+  root.setProperty("--column-width", WIDTHS[settings.width] ?? "none");
 }
 applyReadingVars();
 

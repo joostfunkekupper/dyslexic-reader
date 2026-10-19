@@ -39,7 +39,7 @@
 
   --reading-size: 24px;
   --reading-lh: 1.8;
-  --column-width: calc(var(--reading-size) * 38);
+  --column-width: 52rem;
 }
 
 @media (prefers-color-scheme: dark) {
