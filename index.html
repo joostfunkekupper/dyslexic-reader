@@ -20,10 +20,32 @@
 <body>
   <header class="topbar">
     <a class="brand" href="#/">Dyslexic Reader</a>
-    <button id="theme-toggle" class="icon-btn" type="button" aria-label="Theme: automatic" title="Theme: automatic">
-      <span aria-hidden="true" id="theme-icon">◐</span>
-    </button>
+    <div class="toolbar">
+      <button id="settings-toggle" class="icon-btn" type="button" popovertarget="settings-panel"
+        aria-label="Reading settings" title="Reading settings" hidden>
+        <span aria-hidden="true">Aa</span>
+      </button>
+      <button id="theme-toggle" class="icon-btn" type="button" aria-label="Theme: automatic" title="Theme: automatic">
+        <span aria-hidden="true" id="theme-icon">◐</span>
+      </button>
+    </div>
   </header>
+
+  <div id="settings-panel" class="settings" popover aria-labelledby="settings-heading">
+    <h2 id="settings-heading">Reading settings</h2>
+    <label class="setting">
+      <span>Text size <output id="size-out"></output></span>
+      <input id="size" type="range" min="16" max="56" step="1">
+    </label>
+    <label class="setting">
+      <span>Sentences per page <output id="spp-out"></output></span>
+      <input id="spp" type="range" min="1" max="15" step="1">
+    </label>
+    <label class="setting">
+      <span>Line spacing <output id="lh-out"></output></span>
+      <input id="lh" type="range" min="1.4" max="2.6" step="0.1">
+    </label>
+  </div>
 
   <main id="app" tabindex="-1"></main>
 
@@ -40,24 +62,6 @@
         <a class="back" href="#/">← Books</a>
         <h1 class="book-title"></h1>
       </div>
-
-      <details class="settings">
-        <summary>Reading settings</summary>
-        <div class="settings-body">
-          <label class="setting">
-            <span>Text size <output id="size-out"></output></span>
-            <input id="size" type="range" min="16" max="56" step="1">
-          </label>
-          <label class="setting">
-            <span>Sentences per page <output id="spp-out"></output></span>
-            <input id="spp" type="range" min="1" max="15" step="1">
-          </label>
-          <label class="setting">
-            <span>Line spacing <output id="lh-out"></output></span>
-            <input id="lh" type="range" min="1.4" max="2.6" step="0.1">
-          </label>
-        </div>
-      </details>
 
       <article class="page" aria-live="polite"></article>
 

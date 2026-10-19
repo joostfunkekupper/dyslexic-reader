@@ -30,6 +30,33 @@ function applyReadingVars() {
 }
 applyReadingVars();
 
+// ---------- Reading settings panel (in the toolbar, shown while reading) ----------
+
+const settingsBtn = document.getElementById("settings-toggle");
+const settingsPanel = document.getElementById("settings-panel");
+let onSppChange = () => {};
+
+settingsPanel.addEventListener("toggle", (e) => {
+  settingsBtn.setAttribute("aria-expanded", String(e.newState === "open"));
+});
+
+bindSlider("size", (v) => `${v}px`, applyReadingVars);
+bindSlider("lh", (v) => v.toFixed(1), applyReadingVars);
+bindSlider("spp", (v) => String(v), () => onSppChange());
+
+function bindSlider(key, format, onChange) {
+  const input = document.getElementById(key);
+  const output = document.getElementById(key + "-out");
+  input.value = settings[key];
+  output.textContent = format(settings[key]);
+  input.addEventListener("input", () => {
+    settings[key] = Number(input.value);
+    output.textContent = format(settings[key]);
+    store.set(key, settings[key]);
+    onChange();
+  });
+}
+
 // ---------- Theme: auto -> light -> dark ----------
 
 const themeBtn = document.getElementById("theme-toggle");
@@ -203,6 +230,9 @@ let readerKeyHandler = null;
 function cleanupReader() {
   if (readerKeyHandler) document.removeEventListener("keydown", readerKeyHandler);
   readerKeyHandler = null;
+  onSppChange = () => {};
+  settingsBtn.hidden = true;
+  if (settingsPanel.matches(":popover-open")) settingsPanel.hidePopover();
 }
 
 async function renderReader(slug) {
@@ -275,7 +305,7 @@ async function renderReader(slug) {
   nextBtn.addEventListener("click", () => go(1));
 
   readerKeyHandler = (e) => {
-    if (e.target.closest("input, textarea, select") || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.target.closest("input, textarea, select, [popover]") || e.altKey || e.ctrlKey || e.metaKey) return;
     if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); go(1); }
     else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(-1); }
   };
@@ -291,24 +321,11 @@ async function renderReader(slug) {
     if (Math.abs(dx) > 60) go(dx < 0 ? 1 : -1);
   });
 
-  // Settings sliders
-  bindSlider($("#size"), $("#size-out"), "size", (v) => `${v}px`, applyReadingVars);
-  bindSlider($("#lh"), $("#lh-out"), "lh", (v) => v.toFixed(1), applyReadingVars);
-  bindSlider($("#spp"), $("#spp-out"), "spp", (v) => String(v), () => draw());
+  onSppChange = () => draw();
+  settingsBtn.hidden = false;
 
   draw();
   app.focus({ preventScroll: true });
-}
-
-function bindSlider(input, output, key, format, onChange) {
-  input.value = settings[key];
-  output.textContent = format(settings[key]);
-  input.addEventListener("input", () => {
-    settings[key] = Number(input.value);
-    output.textContent = format(settings[key]);
-    store.set(key, settings[key]);
-    onChange();
-  });
 }
 
 route();
