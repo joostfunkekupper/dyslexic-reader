@@ -43,6 +43,24 @@ const settingsBtn = document.getElementById("settings-toggle");
 const brand = document.querySelector(".brand");
 const bookNav = document.querySelector(".book-nav");
 const bookTitle = document.querySelector(".book-title");
+
+// Pager footer (fixed at the bottom while reading). The open book sets turnPage.
+const pagerBar = document.querySelector(".pager-bar");
+const prevBtn = pagerBar.querySelector(".prev");
+const nextBtn = pagerBar.querySelector(".next");
+const pageNum = pagerBar.querySelector(".page-num");
+let turnPage = () => {};
+prevBtn.addEventListener("click", () => turnPage(-1));
+nextBtn.addEventListener("click", () => turnPage(1));
+
+// Show the fade above the footer only when there's more text below.
+function updateFade() {
+  const more = app.scrollHeight - app.clientHeight - app.scrollTop > 1;
+  pagerBar.classList.toggle("more", more);
+}
+app.addEventListener("scroll", updateFade, { passive: true });
+const fadeObserver = new ResizeObserver(updateFade);
+fadeObserver.observe(app);
 const settingsPanel = document.getElementById("settings-panel");
 let onSppChange = () => {};
 
@@ -195,6 +213,7 @@ function parseBook(md) {
 // ---------- Routing ----------
 
 function route() {
+  app.scrollTop = 0;
   const hash = location.hash.replace(/^#\/?/, "");
   const [view, ...rest] = hash.split("/");
   if (view === "read" && rest.length) renderReader(decodeURIComponent(rest.join("/")));
@@ -253,6 +272,10 @@ function cleanupReader() {
   settingsBtn.hidden = true;
   bookNav.hidden = true;
   brand.hidden = false;
+  turnPage = () => {};
+  pagerBar.hidden = true;
+  fadeObserver.disconnect();
+  fadeObserver.observe(app);
   if (settingsPanel.matches(":popover-open")) settingsPanel.hidePopover();
 }
 
@@ -261,16 +284,12 @@ async function renderReader(slug) {
   app.replaceChildren(document.getElementById("reader-tpl").content.cloneNode(true));
   const $ = (sel) => app.querySelector(sel);
   const pageEl = $(".page");
-  const prevBtn = $(".prev");
-  const nextBtn = $(".next");
-  const pageNum = $(".page-num");
 
   let book;
   try {
     book = await loadBook(slug);
   } catch (err) {
     pageEl.innerHTML = `<p class="message">${escapeHtml(err.message)}.</p>`;
-    $(".pager").hidden = true;
     return;
   }
 
@@ -316,7 +335,8 @@ async function renderReader(slug) {
     nextBtn.disabled = page >= pageCount() - 1;
     pageNum.textContent = `Page ${page + 1} of ${pageCount()}`;
     store.set(progressKey, { index: start, total });
-    if (focus) window.scrollTo({ top: 0 });
+    if (focus) app.scrollTo({ top: 0 });
+    updateFade();
   }
 
   function go(delta) {
@@ -325,8 +345,9 @@ async function renderReader(slug) {
     draw({ focus: true });
   }
 
-  prevBtn.addEventListener("click", () => go(-1));
-  nextBtn.addEventListener("click", () => go(1));
+  turnPage = go;
+  pagerBar.hidden = false;
+  fadeObserver.observe(pageEl);
 
   readerKeyHandler = (e) => {
     if (e.target.closest("input, textarea, select, [popover]") || e.altKey || e.ctrlKey || e.metaKey) return;
