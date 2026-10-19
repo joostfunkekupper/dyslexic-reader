@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dyslexic Reader</title>
+  <meta name="description" content="A simple book reader using the OpenDyslexic font.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="preload" href="fonts/OpenDyslexic-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%96%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Apply the saved theme before first paint to avoid a flash.
+    try {
+      const t = localStorage.getItem("theme");
+      if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+    } catch {}
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/">Dyslexic Reader</a>
+    <button id="theme-toggle" class="icon-btn" type="button" aria-label="Theme: automatic" title="Theme: automatic">
+      <span aria-hidden="true" id="theme-icon">◐</span>
+    </button>
+  </header>
+
+  <main id="app" tabindex="-1"></main>
+
+  <template id="library-tpl">
+    <section class="library">
+      <h1>Choose a book</h1>
+      <ul class="book-list"></ul>
+    </section>
+  </template>
+
+  <template id="reader-tpl">
+    <section class="reader">
+      <div class="reader-head">
+        <a class="back" href="#/">← Books</a>
+        <h1 class="book-title"></h1>
+      </div>
+
+      <details class="settings">
+        <summary>Reading settings</summary>
+        <div class="settings-body">
+          <label class="setting">
+            <span>Text size <output id="size-out"></output></span>
+            <input id="size" type="range" min="16" max="56" step="1">
+          </label>
+          <label class="setting">
+            <span>Sentences per page <output id="spp-out"></output></span>
+            <input id="spp" type="range" min="1" max="15" step="1">
+          </label>
+          <label class="setting">
+            <span>Line spacing <output id="lh-out"></output></span>
+            <input id="lh" type="range" min="1.4" max="2.6" step="0.1">
+          </label>
+        </div>
+      </details>
+
+      <article class="page" aria-live="polite"></article>
+
+      <nav class="pager" aria-label="Pages">
+        <button class="prev" type="button">← Back</button>
+        <span class="page-num"></span>
+        <button class="next" type="button">Next →</button>
+      </nav>
+    </section>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
