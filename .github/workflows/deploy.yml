@@ -36,6 +36,14 @@ jobs:
           cp -r index.html styles.css app.js fonts books _site/
           touch _site/.nojekyll
 
+      # Tag asset URLs with the commit so browsers never mix a new page with cached old scripts.
+      - name: Add version to asset URLs
+        run: |
+          v="${GITHUB_SHA::7}"
+          sed -i -e "s|href=\"styles.css\"|href=\"styles.css?v=$v\"|" \
+                 -e "s|src=\"app.js\"|src=\"app.js?v=$v\"|" _site/index.html
+          grep -q "styles.css?v=$v" _site/index.html && grep -q "app.js?v=$v" _site/index.html
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
