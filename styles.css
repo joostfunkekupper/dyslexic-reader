@@ -339,8 +339,9 @@ fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
 .the-end {
   display: grid;
   justify-items: center;
-  gap: 1.5rem;
-  padding: 3rem 0;
+  align-content: center;
+  gap: 2rem;
+  min-height: 60dvh;
   text-align: center;
 }
 .the-end p {
@@ -348,7 +349,20 @@ fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
   font-size: 2em;
   font-weight: 700;
 }
-.the-end a { font-size: 0.6em; }
+.end-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  font-size: 0.6em;
+  text-decoration: none;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.6em 1.2em;
+}
+.end-link:hover { border-color: var(--accent); }
+.end-link svg { flex: none; color: var(--accent); }
 
 .pager-bar {
   border-top: 1px solid var(--border);

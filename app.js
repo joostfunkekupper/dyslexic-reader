@@ -379,6 +379,13 @@ function celebrate() {
 
 // ---------- Reader ----------
 
+// The extra page shown after the last page of text. The link looks like a button
+// and carries an open-book icon.
+const END_PAGE_HTML = `<div class="the-end">
+  <p>The end.</p>
+  <a class="end-link" href="#/"><svg aria-hidden="true" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.5 5 8.5 4.5 6 4.5H3v13h3c2.5 0 4.5.5 6 2 1.5-1.5 3.5-2 6-2h3v-13h-3c-2.5 0-4.5.5-6 2Z"/><path d="M12 6.5v13"/></svg>Choose another book</a>
+</div>`;
+
 let readerKeyHandler = null;
 
 function cleanupReader() {
@@ -447,7 +454,7 @@ async function renderReader(slug) {
       html += s.html;
     }
     if (openPara !== null) html += "</p>";
-    if (atEnd) html = `<div class="the-end"><p>The end.</p><a href="#/">Choose another book</a></div>`;
+    if (atEnd) html = END_PAGE_HTML;
     if (!total) html = `<p class="message">This book is empty.</p>`;
     pageEl.innerHTML = html;
 
