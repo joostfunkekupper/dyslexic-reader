@@ -358,18 +358,16 @@ fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
   margin: 1em 0;
 }
 .page hr::after { content: "* * *"; color: var(--muted); }
-/* Word mode: centre the words vertically on the page. */
+/* Word mode: centre the words on the page, both ways. */
 .page.by-word {
   display: grid;
   align-content: center;
   min-height: 60dvh;
-}
-.page.by-word > :last-child { margin-bottom: 0; }
-/* One word at a time: also show it big and centred across. */
-.page.single-word {
-  place-items: center;
   text-align: center;
 }
+.page.by-word > :last-child { margin-bottom: 0; }
+/* One word at a time: also show it big. */
+.page.single-word { place-items: center; }
 .page.single-word p { margin: 0; font-size: 1.6em; }
 .page code { font-family: inherit; background: var(--surface); padding: 0 0.2em; border-radius: 4px; }
 .the-end {
