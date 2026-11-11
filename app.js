@@ -125,30 +125,29 @@ function bindSlider(key, format, onChange) {
   });
 }
 
-// ---------- Theme: auto -> light -> dark ----------
+// ---------- Theme: light <-> dark ----------
 
 const themeBtn = document.getElementById("theme-toggle");
 const themeIcon = document.getElementById("theme-icon");
-const THEMES = ["auto", "light", "dark"];
-const THEME_ICONS = { auto: "◐", light: "☀", dark: "☾" };
+const THEME_ICONS = { light: "☀", dark: "☾" };
 
 function applyTheme(theme) {
-  if (theme === "auto") delete document.documentElement.dataset.theme;
-  else document.documentElement.dataset.theme = theme;
+  document.documentElement.dataset.theme = theme;
   themeIcon.textContent = THEME_ICONS[theme];
-  const label = `Theme: ${theme === "auto" ? "automatic" : theme}`;
+  const label = `Theme: ${theme}`;
   themeBtn.setAttribute("aria-label", label);
   themeBtn.title = label;
 }
 
+// Until a theme is chosen, start from the system's light/dark preference.
 let theme = (() => {
-  try { return localStorage.getItem("theme") || "auto"; } catch { return "auto"; }
+  try { return localStorage.getItem("theme"); } catch { return null; }
 })();
-if (!THEMES.includes(theme)) theme = "auto";
+if (!(theme in THEME_ICONS)) theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 applyTheme(theme);
 
 themeBtn.addEventListener("click", () => {
-  theme = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+  theme = theme === "dark" ? "light" : "dark";
   try { localStorage.setItem("theme", theme); } catch {}
   applyTheme(theme);
 });

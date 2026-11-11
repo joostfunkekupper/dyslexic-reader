@@ -4,7 +4,7 @@ A simple book reader that uses the [OpenDyslexic](https://opendyslexic.org/) fon
 
 - Choose a book from the landing page (titles come from the first line of each Markdown file).
 - Adjust text size, line spacing and how many sentences appear per page.
-- Light, dark and automatic themes.
+- Light and dark themes.
 - Your place in each book is remembered in your browser.
 - Use the arrow keys or the page buttons to turn pages.
 
