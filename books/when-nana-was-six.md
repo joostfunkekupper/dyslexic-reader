@@ -1,4 +1,5 @@
 # When Nana Was Six
+<!-- sticker: 📺 -->
 
 Ruby is six years old. One day, she asks her nana a question.
 

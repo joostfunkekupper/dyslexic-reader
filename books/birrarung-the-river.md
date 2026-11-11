@@ -1,4 +1,5 @@
 # Birrarung, the River
+<!-- sticker: 🦆 -->
 
 Today, Ms Tran's class is going on a walk to the river.
 

@@ -1,4 +1,5 @@
 # Monster Truck Mia
+<!-- sticker: 🛻 -->
 
 Mia has a big blue monster truck called Thunder. Its wheels are taller than Mia!
 

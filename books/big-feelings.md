@@ -1,4 +1,5 @@
 # Big Feelings
+<!-- sticker: ⚽ -->
 
 On Monday, Felix plays soccer with his friends. He kicks a goal!
 

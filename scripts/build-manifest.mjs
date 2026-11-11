@@ -1,5 +1,6 @@
-// Scans books/*.md and writes books/index.json: [{ slug, file, title, words, level }].
+// Scans books/*.md and writes books/index.json: [{ slug, file, title, sticker, words, level }].
 // The title is the first non-empty line of each file, with any leading "#" removed.
+// The sticker (earned for finishing the book) comes from a `<!-- sticker: 🐉 -->` line; default ⭐.
 // The reading level (1-3) is estimated from the text; see readingLevel() below.
 // Run locally with: node scripts/build-manifest.mjs
 
@@ -44,7 +45,10 @@ for (const file of files) {
   const titleIdx = lines.findIndex((line) => line.trim() !== "");
   const slug = file.replace(/\.md$/i, "");
   const title = (lines[titleIdx] ?? "").replace(/^#+\s*/, "").trim() || slug;
-  books.push({ slug, file, title, ...readingLevel(lines.slice(titleIdx + 1).join("\n")) });
+  const sticker = text.match(/<!--\s*sticker:\s*(.+?)\s*-->/)?.[1] || "⭐";
+  // HTML comments are not part of the story, so leave them out of the word count and level.
+  const body = lines.slice(titleIdx + 1).filter((line) => !/^\s*<!--.*-->\s*$/.test(line));
+  books.push({ slug, file, title, sticker, ...readingLevel(body.join("\n")) });
 }
 
 books.sort((a, b) => a.level - b.level || a.title.localeCompare(b.title));

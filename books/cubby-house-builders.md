@@ -1,4 +1,5 @@
 # The Cubby House Builders
+<!-- sticker: 🧸 -->
 
 Mia and Jack want to build a cubby house for Teddy. Dark clouds are coming.
 

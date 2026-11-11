@@ -1,4 +1,5 @@
 # The Picnic of Shapes
+<!-- sticker: 🧺 -->
 
 Ava and her little brother Leo are having a picnic in the park.
 

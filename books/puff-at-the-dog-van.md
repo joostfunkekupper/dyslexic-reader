@@ -1,4 +1,5 @@
 # Puff at the Dog Van
+<!-- sticker: 🐶 -->
 
 I am Tess.
 

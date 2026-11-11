@@ -1,4 +1,5 @@
 # Ted and the Red Hen
+<!-- sticker: 🐔 -->
 
 Ted has a hen.
 

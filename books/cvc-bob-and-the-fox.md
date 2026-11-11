@@ -1,4 +1,5 @@
 # Bob and the Fox
+<!-- sticker: 🦊 -->
 
 Bob has a dog.
 

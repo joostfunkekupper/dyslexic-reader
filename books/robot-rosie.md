@@ -1,4 +1,5 @@
 # Robot Rosie Follows the Steps
+<!-- sticker: 🤖 -->
 
 Isla has a toy robot called Rosie. Rosie is small and round, with big blue eyes.
 

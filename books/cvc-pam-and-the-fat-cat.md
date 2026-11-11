@@ -1,4 +1,5 @@
 # Pam and the Fat Cat
+<!-- sticker: 🐱 -->
 
 Pam has a cat.
 

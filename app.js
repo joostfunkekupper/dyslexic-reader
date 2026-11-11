@@ -53,6 +53,9 @@ const pagerBar = document.querySelector(".pager-bar");
 const prevBtn = pagerBar.querySelector(".prev");
 const nextBtn = pagerBar.querySelector(".next");
 const pageNum = pagerBar.querySelector(".page-num");
+// Journey bar: the book's sticker travels toward the finish flag as pages turn.
+const journey = pagerBar.querySelector(".journey");
+const journeyTraveller = pagerBar.querySelector(".journey-traveller");
 let turnPage = () => {};
 prevBtn.addEventListener("click", () => turnPage(-1));
 nextBtn.addEventListener("click", () => turnPage(1));
@@ -220,6 +223,7 @@ function parseBook(md) {
   for (const raw of body) {
     const line = raw.trim();
     if (line === "") { flush(); continue; }
+    if (/^<!--.*-->$/.test(line)) continue; // e.g. <!-- sticker: 🐉 -->
     if (/^#{1,6}\s+/.test(line)) { flush(); blocks.push({ type: "h", text: line.replace(/^#+\s*/, "") }); continue; }
     if (/^([-*_])(\s*\1){2,}$/.test(line)) { flush(); blocks.push({ type: "hr" }); continue; }
     if (/^([-*+]|\d+[.)])\s+/.test(line)) { flush(); para.push(line.replace(/^([-*+]|\d+[.)])\s+/, "")); flush(); continue; }
@@ -310,6 +314,8 @@ async function renderLibrary() {
     return;
   }
 
+  renderStickerShelf(books);
+
   // Group by reading level, easiest first (the manifest is already sorted).
   for (const level of [...new Set(books.map((b) => b.level ?? 0))].sort((a, b) => (a || 99) - (b || 99))) {
     const section = document.createElement("section");
@@ -326,6 +332,57 @@ async function renderLibrary() {
     section.append(heading, ul);
     list.append(section);
   }
+}
+
+// ---------- Stickers (one per book, earned by reaching "The end.") ----------
+
+// Kept separately from reading progress, so a sticker stays earned even if the
+// reader later turns back from the end page or reads the book again.
+function earnedStickers() {
+  return new Set(store.get("stickers", []));
+}
+
+/** Records the book's sticker as earned. Returns true if it is newly earned. */
+function earnSticker(slug) {
+  const earned = earnedStickers();
+  if (earned.has(slug)) return false;
+  earned.add(slug);
+  store.set("stickers", [...earned]);
+  return true;
+}
+
+function renderStickerShelf(books) {
+  // Books finished before stickers existed still count.
+  for (const book of books) {
+    if (store.get("progress:" + book.slug, null)?.end) earnSticker(book.slug);
+  }
+  const earned = earnedStickers();
+  const count = books.filter((b) => earned.has(b.slug)).length;
+
+  const section = app.querySelector(".stickers");
+  const shelf = section.querySelector(".sticker-shelf");
+  section.querySelector(".sticker-count").textContent = count ? `· ${count} of ${books.length}` : "";
+  if (!count) {
+    shelf.innerHTML = `<p class="sticker-hint">Finish a book to earn your first sticker!</p>`;
+  } else {
+    for (const book of books) {
+      if (earned.has(book.slug)) {
+        const span = document.createElement("span");
+        span.className = "sticker";
+        span.setAttribute("role", "img");
+        span.setAttribute("aria-label", `${book.title} sticker`);
+        span.textContent = book.sticker || "⭐";
+        shelf.append(span);
+      } else {
+        // Unearned stickers stay a surprise.
+        const span = document.createElement("span");
+        span.className = "sticker locked";
+        span.innerHTML = `<span class="sr-only">Not read yet</span>`;
+        shelf.append(span);
+      }
+    }
+  }
+  section.hidden = false;
 }
 
 const LEVELS = { 1: "First words", 2: "Early reader", 3: "Growing reader" };
@@ -451,12 +508,16 @@ function celebrate() {
 
 // ---------- Reader ----------
 
-// The extra page shown after the last page of text. The link looks like a button
-// and carries an open-book icon.
-const END_PAGE_HTML = `<div class="the-end">
+// The extra page shown after the last page of text, with the book's sticker.
+// The link looks like a button and carries an open-book icon.
+function endPageHtml(sticker, isNew) {
+  return `<div class="the-end">
+  <div class="end-sticker${isNew ? " new" : ""}" aria-hidden="true">${escapeHtml(sticker)}</div>
   <p>The end.</p>
+  <p class="end-earned">${isNew ? "You earned a sticker!" : "You've got this sticker!"}</p>
   <a class="end-link" href="#/"><svg aria-hidden="true" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.5 5 8.5 4.5 6 4.5H3v13h3c2.5 0 4.5.5 6 2 1.5-1.5 3.5-2 6-2h3v-13h-3c-2.5 0-4.5.5-6 2Z"/><path d="M12 6.5v13"/></svg>Choose another book</a>
 </div>`;
+}
 
 let readerKeyHandler = null;
 
@@ -469,6 +530,8 @@ function cleanupReader() {
   brand.hidden = false;
   turnPage = () => {};
   pagerBar.hidden = true;
+  journeyTraveller.textContent = "";
+  journey.style.removeProperty("--progress");
   fadeObserver.disconnect();
   fadeObserver.observe(app);
   if (settingsPanel.matches(":popover-open")) settingsPanel.hidePopover();
@@ -494,6 +557,10 @@ async function renderReader(slug) {
   brand.hidden = true;
   bookNav.hidden = false;
   document.title = `${title} · Dyslexic Reader`;
+  const sticker = book.meta.sticker || "⭐";
+  journeyTraveller.textContent = sticker;
+  // Whether the sticker on the end page was just earned (vs. earned before).
+  let stickerIsNew = false;
 
   const progressKey = "progress:" + slug;
   // Position is tracked by sentence (and word), so changing the reading unit or
@@ -545,12 +612,14 @@ async function renderReader(slug) {
       html += s.html;
     }
     if (openPara !== null) html += "</p>";
-    if (atEnd) html = END_PAGE_HTML;
+    if (atEnd) html = endPageHtml(sticker, stickerIsNew);
     if (!total()) html = `<p class="message">This book is empty.</p>`;
     pageEl.innerHTML = html;
     const wordPage = byWord() && !atEnd && total() > 0;
     pageEl.classList.toggle("by-word", wordPage);
     pageEl.classList.toggle("single-word", wordPage && perPage() === 1);
+    // 0 on the first page, 1 on "The end." page.
+    journey.style.setProperty("--progress", String(Math.min(1, page / textPages())));
 
     prevBtn.disabled = page === 0;
     nextBtn.disabled = page >= pageCount() - 1;
@@ -573,9 +642,11 @@ async function renderReader(slug) {
     const page = Math.min(pageCount() - 1, Math.max(0, before + delta));
     atEnd = Boolean(total()) && page === textPages();
     if (!atEnd) setPosition(page * perPage());
+    // Turning onto the "The end." page earns the sticker and celebrates.
+    const finished = atEnd && page !== before;
+    if (finished) stickerIsNew = earnSticker(slug);
     draw({ focus: true });
-    // Celebrate when turning onto the "The end." page.
-    if (atEnd && page !== before) celebrate();
+    if (finished) celebrate();
   }
 
   turnPage = go;

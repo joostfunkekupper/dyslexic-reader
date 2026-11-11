@@ -1,4 +1,5 @@
 # Four Seasons in One Day
+<!-- sticker: 🌦️ -->
 
 In the morning, it is cold. Sam can see his breath in the air.
 

@@ -1,4 +1,5 @@
 # The Best Stuff
+<!-- sticker: 🛒 -->
 
 Mum sent Pip and Tim to the shop.
 

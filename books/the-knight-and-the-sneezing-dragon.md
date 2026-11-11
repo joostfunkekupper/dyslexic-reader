@@ -1,4 +1,5 @@
 # The Knight and the Sneezing Dragon
+<!-- sticker: 🐉 -->
 
 Sir Max is a young knight. He has a shiny helmet, a wooden shield and a brave horse called Clover.
 

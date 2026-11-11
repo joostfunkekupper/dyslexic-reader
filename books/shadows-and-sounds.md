@@ -1,4 +1,5 @@
 # Shadows and Sounds
+<!-- sticker: 🥁 -->
 
 It is a rainy day, so Zara and her grandpa are playing inside.
 

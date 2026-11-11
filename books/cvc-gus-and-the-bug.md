@@ -1,4 +1,5 @@
 # Gus and the Bug
+<!-- sticker: 🐞 -->
 
 Gus has a cup.
 

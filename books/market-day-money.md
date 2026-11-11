@@ -1,4 +1,5 @@
 # Milo's Market Day
+<!-- sticker: 🪙 -->
 
 It is Saturday. Milo and Dad are going to the market.
 

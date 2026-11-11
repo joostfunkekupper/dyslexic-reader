@@ -1,4 +1,5 @@
 # Who Lives in the Garden?
+<!-- sticker: 🐌 -->
 
 Noah has a magnifying glass. Today he is a garden explorer.
 

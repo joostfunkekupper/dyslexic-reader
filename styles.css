@@ -40,6 +40,7 @@
   --reading-size: 24px;
   --reading-lh: 1.8;
   --column-width: 52rem;
+  --emoji-font: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -182,6 +183,31 @@ main:focus { outline: none; }
   font-size: 1.15rem;
 }
 .book-list a:hover { border-color: var(--accent); }
+
+/* Sticker shelf: one sticker per finished book. */
+.stickers { margin: 0 0 2rem; }
+.stickers h2 { font-size: 1.05rem; margin: 0 0 0.75rem; }
+.sticker-count { color: var(--muted); font-weight: 400; }
+.sticker-shelf { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.sticker-hint { margin: 0; color: var(--muted); }
+.sticker {
+  display: inline-grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-family: var(--emoji-font);
+  font-size: 2.1rem;
+  line-height: 1;
+  cursor: default;
+  user-select: none;
+}
+.sticker.locked {
+  background: none;
+  border: 2px dashed var(--border);
+}
 .book-meta {
   display: flex;
   align-items: center;
@@ -383,6 +409,25 @@ fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
   font-size: 2em;
   font-weight: 700;
 }
+.the-end .end-earned {
+  margin-top: -1.25rem;
+  font-size: 1em;
+  font-weight: 400;
+  color: var(--muted);
+}
+.end-sticker {
+  font-family: var(--emoji-font);
+  font-size: 4em;
+  line-height: 1;
+}
+.end-sticker.new { animation: sticker-pop 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+@keyframes sticker-pop {
+  from { transform: scale(0.2) rotate(-20deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .end-sticker.new { animation: none; }
+}
 .end-link {
   display: inline-flex;
   align-items: center;
@@ -421,6 +466,46 @@ fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
 .pager-bar.more::before { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .pager-bar::before { transition: none; }
+}
+/* Journey bar: the book's sticker travels along the track to the finish flag. */
+.journey {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  max-width: var(--column-width);
+  margin: 0.25rem auto 0.75rem;
+  padding: 0 0.25rem 0 1.25rem;
+  --progress: 0;
+}
+.journey-track {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.journey-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--progress) * 100%);
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+.journey-traveller {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--progress) * 100%);
+  transform: translate(-50%, -55%);
+  font-family: var(--emoji-font);
+  font-size: 2rem;
+  line-height: 1;
+  transition: left 0.4s ease;
+}
+.journey-flag { font-family: var(--emoji-font); font-size: 1.6rem; line-height: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .journey-fill, .journey-traveller { transition: none; }
 }
 .pager {
   display: flex;

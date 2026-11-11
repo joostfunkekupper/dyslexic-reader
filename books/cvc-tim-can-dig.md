@@ -1,4 +1,5 @@
 # Tim Can Dig
+<!-- sticker: 🪱 -->
 
 Tim can dig.
 

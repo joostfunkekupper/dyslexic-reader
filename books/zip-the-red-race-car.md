@@ -1,4 +1,5 @@
 # Zip the Red Race Car
+<!-- sticker: 🏎️ -->
 
 Zip is a red race car.
 
