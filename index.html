@@ -41,9 +41,20 @@
       <span>Text size <output id="size-out"></output></span>
       <input id="size" type="range" min="16" max="56" step="1">
     </label>
-    <label class="setting">
+    <fieldset class="setting">
+      <legend>Read by</legend>
+      <div class="segmented two" id="unit">
+        <label><input type="radio" name="unit" value="sentence"><span>Sentence</span></label>
+        <label><input type="radio" name="unit" value="word"><span>Word</span></label>
+      </div>
+    </fieldset>
+    <label class="setting" id="spp-setting">
       <span>Sentences per page <output id="spp-out"></output></span>
       <input id="spp" type="range" min="1" max="15" step="1">
+    </label>
+    <label class="setting" id="wpp-setting">
+      <span>Words per page <output id="wpp-out"></output></span>
+      <input id="wpp" type="range" min="1" max="15" step="1">
     </label>
     <label class="setting">
       <span>Line spacing <output id="lh-out"></output></span>

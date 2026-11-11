@@ -260,6 +260,7 @@ main:focus { outline: none; }
   gap: 0.35rem;
   font-size: 0.9rem;
 }
+.setting[hidden] { display: none; }
 fieldset.setting { border: 0; margin: 0; padding: 0; min-width: 0; }
 fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
 .segmented {
@@ -269,6 +270,7 @@ fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
   border-radius: 10px;
   overflow: hidden;
 }
+.segmented.two { grid-template-columns: repeat(2, 1fr); }
 .segmented label { position: relative; }
 .segmented label + label { border-left: 1px solid var(--border); }
 .segmented input {
@@ -356,6 +358,19 @@ fieldset.setting legend { padding: 0; margin-bottom: 0.35rem; }
   margin: 1em 0;
 }
 .page hr::after { content: "* * *"; color: var(--muted); }
+/* Word mode: centre the words vertically on the page. */
+.page.by-word {
+  display: grid;
+  align-content: center;
+  min-height: 60dvh;
+}
+.page.by-word > :last-child { margin-bottom: 0; }
+/* One word at a time: also show it big and centred across. */
+.page.single-word {
+  place-items: center;
+  text-align: center;
+}
+.page.single-word p { margin: 0; font-size: 1.6em; }
 .page code { font-family: inherit; background: var(--surface); padding: 0 0.2em; border-radius: 4px; }
 .the-end {
   display: grid;

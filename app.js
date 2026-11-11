@@ -21,6 +21,8 @@ const store = {
 const settings = {
   size: store.get("size", 24),
   spp: store.get("spp", 3),
+  wpp: store.get("wpp", 1),
+  unit: store.get("unit", "sentence") === "word" ? "word" : "sentence",
   lh: store.get("lh", 1.8),
   width: store.get("width", "medium"),
   hyphens: store.get("hyphens", false) === true,
@@ -73,6 +75,25 @@ settingsPanel.addEventListener("toggle", (e) => {
 bindSlider("size", (v) => `${v}px`, applyReadingVars);
 bindSlider("lh", (v) => v.toFixed(1), applyReadingVars);
 bindSlider("spp", (v) => String(v), () => onSppChange());
+bindSlider("wpp", (v) => String(v), () => onSppChange());
+
+// Read by sentence or by word; only the matching "per page" slider is shown.
+const sppSetting = document.getElementById("spp-setting");
+const wppSetting = document.getElementById("wpp-setting");
+function showUnitSlider() {
+  sppSetting.hidden = settings.unit !== "sentence";
+  wppSetting.hidden = settings.unit !== "word";
+}
+showUnitSlider();
+for (const radio of document.querySelectorAll('#unit input[name="unit"]')) {
+  radio.checked = radio.value === settings.unit;
+  radio.addEventListener("change", () => {
+    settings.unit = radio.value;
+    store.set("unit", settings.unit);
+    showUnitSlider();
+    onSppChange();
+  });
+}
 
 for (const radio of document.querySelectorAll('#width input[name="width"]')) {
   radio.checked = radio.value === settings.width;
@@ -208,16 +229,55 @@ function parseBook(md) {
   flush();
 
   const sentences = [];
+  const words = [];
   let pending = [];
   blocks.forEach((block, i) => {
     if (block.type !== "p") { pending.push(block); return; }
     for (const s of splitSentences(block.text)) {
-      sentences.push({ html: inline(s), para: i, before: pending });
+      const html = inline(s);
+      const sentence = sentences.length;
+      sentences.push({ html, para: i, before: pending, firstWord: words.length });
+      splitHtmlWords(html).forEach((w, j) => {
+        words.push({ html: w, para: i, before: j === 0 ? pending : [], sentence });
+      });
       pending = [];
     }
   });
 
-  return { title, sentences };
+  return { title, sentences, words };
+}
+
+/**
+ * Splits a sentence's HTML into words, closing and reopening any formatting
+ * (<em>, <strong>, <code>) that spans several words so each word stands alone.
+ */
+function splitHtmlWords(html) {
+  const words = [];
+  const open = [];
+  let cur = "";
+  let hasText = false;
+  const finish = () => {
+    if (hasText) words.push(cur + open.map((t) => `</${t.name}>`).reverse().join(""));
+    cur = open.map((t) => t.tag).join("");
+    hasText = false;
+  };
+  for (const token of html.match(/<[^>]+>|[^<]+/g) || []) {
+    if (token.startsWith("</")) {
+      open.pop();
+      cur += token;
+    } else if (token.startsWith("<")) {
+      open.push({ tag: token, name: token.slice(1).split(/[\s>]/)[0] });
+      cur += token;
+    } else {
+      for (const part of token.split(/(\s+)/)) {
+        if (!part) continue;
+        if (/^\s+$/.test(part)) finish();
+        else { cur += part; hasText = true; }
+      }
+    }
+  }
+  finish();
+  return words;
 }
 
 // ---------- Routing ----------
@@ -434,22 +494,41 @@ async function renderReader(slug) {
   bookNav.hidden = false;
   document.title = `${title} · Dyslexic Reader`;
 
-  const total = book.sentences.length;
   const progressKey = "progress:" + slug;
-  // Position is tracked by sentence, so changing sentences-per-page keeps your place.
+  // Position is tracked by sentence (and word), so changing the reading unit or
+  // the amount per page keeps your place.
   const saved = store.get(progressKey, { index: 0 });
-  let index = Math.min(saved.index || 0, Math.max(0, total - 1));
+  const lastSentence = Math.max(0, book.sentences.length - 1);
+  let sentenceIndex = Math.min(saved.index || 0, lastSentence);
+  let wordIndex = Number.isInteger(saved.word) && book.words[saved.word]?.sentence === sentenceIndex
+    ? saved.word
+    : book.sentences[sentenceIndex]?.firstWord ?? 0;
   // After the text there is one extra "The end." page.
-  let atEnd = Boolean(saved.end && total);
+  let atEnd = Boolean(saved.end && book.sentences.length);
 
-  const textPages = () => Math.max(1, Math.ceil(total / settings.spp));
-  const pageCount = () => textPages() + (total ? 1 : 0);
-  const currentPage = () => (atEnd ? textPages() : Math.floor(index / settings.spp));
+  const byWord = () => settings.unit === "word";
+  const units = () => (byWord() ? book.words : book.sentences);
+  const perPage = () => (byWord() ? settings.wpp : settings.spp);
+  const total = () => units().length;
+  const position = () => (byWord() ? wordIndex : sentenceIndex);
+  const textPages = () => Math.max(1, Math.ceil(total() / perPage()));
+  const pageCount = () => textPages() + (total() ? 1 : 0);
+  const currentPage = () => (atEnd ? textPages() : Math.floor(position() / perPage()));
+
+  function setPosition(i) {
+    if (byWord()) {
+      wordIndex = i;
+      sentenceIndex = book.words[i]?.sentence ?? 0;
+    } else {
+      sentenceIndex = i;
+      wordIndex = book.sentences[i]?.firstWord ?? 0;
+    }
+  }
 
   function draw({ focus = false } = {}) {
     const page = currentPage();
-    const start = Math.min(page * settings.spp, total);
-    const slice = atEnd ? [] : book.sentences.slice(start, start + settings.spp);
+    const start = Math.min(page * perPage(), total());
+    const slice = atEnd ? [] : units().slice(start, start + perPage());
 
     let html = "";
     let openPara = null;
@@ -466,13 +545,24 @@ async function renderReader(slug) {
     }
     if (openPara !== null) html += "</p>";
     if (atEnd) html = END_PAGE_HTML;
-    if (!total) html = `<p class="message">This book is empty.</p>`;
+    if (!total()) html = `<p class="message">This book is empty.</p>`;
     pageEl.innerHTML = html;
+    const wordPage = byWord() && !atEnd && total() > 0;
+    pageEl.classList.toggle("by-word", wordPage);
+    pageEl.classList.toggle("single-word", wordPage && perPage() === 1);
 
     prevBtn.disabled = page === 0;
     nextBtn.disabled = page >= pageCount() - 1;
-    pageNum.textContent = `Page ${page + 1} of ${pageCount()}`;
-    store.set(progressKey, { index: atEnd ? index : start, total, end: atEnd });
+    if (!byWord()) pageNum.textContent = `Page ${page + 1} of ${pageCount()}`;
+    else if (atEnd) pageNum.textContent = "The end";
+    else {
+      // Number by word instead of page: "Word 3 of 245", or "Words 4–6 of 245".
+      const last = start + slice.length;
+      const range = slice.length > 1 ? `Words ${start + 1}–${last}` : `Word ${start + 1}`;
+      pageNum.textContent = `${range} of ${total()}`;
+    }
+    if (!atEnd) setPosition(start);
+    store.set(progressKey, { index: sentenceIndex, word: wordIndex, total: book.sentences.length, end: atEnd });
     if (focus) app.scrollTo({ top: 0 });
     updateFade();
   }
@@ -480,8 +570,8 @@ async function renderReader(slug) {
   function go(delta) {
     const before = currentPage();
     const page = Math.min(pageCount() - 1, Math.max(0, before + delta));
-    atEnd = Boolean(total) && page === textPages();
-    if (!atEnd) index = page * settings.spp;
+    atEnd = Boolean(total()) && page === textPages();
+    if (!atEnd) setPosition(page * perPage());
     draw({ focus: true });
     // Celebrate when turning onto the "The end." page.
     if (atEnd && page !== before) celebrate();
