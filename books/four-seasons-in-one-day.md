@@ -25,11 +25,3 @@ At night, Sam looks out the window. The sky is clear, and he can see the stars.
 Sam tells Mum, "Today was cold, rainy, hot and windy!"
 
 Mum laughs. "That is Melbourne. Four seasons in one day!"
-
----
-
-What is the weather like today? Is it hot, cold, rainy or windy?
-
-What clothes do you wear when it is cold? What about when it is hot?
-
-Can you remember the five SunSmart steps?

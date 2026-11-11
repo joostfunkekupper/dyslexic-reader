@@ -29,11 +29,3 @@ Back at school, the class makes a big picture of the river.
 They draw the gum trees, the ducks and the water. At the top, they write a word in big letters.
 
 Birrarung.
-
----
-
-What is the Wurundjeri name for the Yarra River?
-
-What did the children hear when they closed their eyes?
-
-What are some ways you can care for the land and the water?

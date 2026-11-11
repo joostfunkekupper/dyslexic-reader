@@ -29,11 +29,3 @@ They put the soft woolly blanket inside for a bed.
 That night, it rains. In the morning, they run outside.
 
 Teddy is warm and dry. He looks very happy in his new home.
-
----
-
-What is a material? Can you name three materials in your house?
-
-Why was plastic better than paper for the roof?
-
-If you built a cubby house, what would you make it from?

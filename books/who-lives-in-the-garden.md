@@ -31,11 +31,3 @@ The lizard looks at the snail on the leaf. Noah moves the snail up high, just in
 That night, Noah draws a picture of the garden. He draws the worm, the snail, the magpie and the lizard.
 
 He makes sure there is a home for everyone.
-
----
-
-What living things can you find in your garden or at the park?
-
-How is a worm different from a magpie?
-
-What do all living things need to stay alive?

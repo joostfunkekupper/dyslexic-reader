@@ -45,11 +45,3 @@ Milo thinks hard. "96, then 106!"
 "Well done!" says Dad.
 
 Milo smiles all the way home.
-
----
-
-What coins do you know? Which one is the biggest?
-
-Can you count by fives to 50? Can you count by tens to 120?
-
-If an apple is 50 cents, how much are two apples?

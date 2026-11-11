@@ -35,11 +35,3 @@ After dinner, Zara puts on a show for the family.
 She makes shadow animals on the wall. Grandpa plays the drum. Boom for the elephant. Tap, tap for the little mouse.
 
 Everyone claps. Clap, clap, clap!
-
----
-
-What makes a shadow?
-
-How can you make a shadow bigger?
-
-Put your hand on your throat and talk. What can you feel?

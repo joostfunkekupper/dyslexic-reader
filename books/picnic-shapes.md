@@ -37,11 +37,3 @@ Leo finds a leaf. "What shape is this?" he asks.
 Ava laughs. "Leaves can be all sorts of shapes. That one looks like a heart!"
 
 It was the best picnic ever. Even the shapes had fun.
-
----
-
-Can you find a circle, a square, a triangle and a rectangle in your room?
-
-If you cut an apple into halves, how many pieces do you get?
-
-How could you share 8 grapes fairly between two people?

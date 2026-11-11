@@ -37,11 +37,3 @@ Ruby jumps up. "I play chasey too!"
 That night, Ruby draws a picture. On one side, she draws Nana's old TV and phone. On the other side, she draws her own TV and tablet.
 
 In the middle, she draws Nana and herself playing chasey.
-
----
-
-What toys and games did your grandparents play with?
-
-How are phones different now from long ago?
-
-What is one thing that is still the same?

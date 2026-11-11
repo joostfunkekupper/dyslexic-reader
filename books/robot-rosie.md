@@ -39,11 +39,3 @@ Spin around. Go forward. Go back. Spin around again.
 Rosie dances across the floor. Beep, beep, boop!
 
 Isla smiles. "Good night, Rosie. Tomorrow we will make new steps."
-
----
-
-What steps did Isla give Rosie to get to the toy box?
-
-Why did Rosie bump into the couch, and how did Isla fix it?
-
-What are the steps for getting dressed in the morning?

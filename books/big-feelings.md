@@ -29,11 +29,3 @@ Felix practises reading at home. When he reads to the class, he still feels a li
 On Friday, Felix gets a sticker for trying his best. He feels proud.
 
 He stands up tall, and he cannot stop smiling.
-
----
-
-How does your body feel when you are happy? What about when you are angry?
-
-Who can you talk to when you feel sad or worried?
-
-Try taking three big, slow breaths. How do you feel now?
