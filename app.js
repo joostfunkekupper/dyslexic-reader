@@ -363,7 +363,9 @@ function bookCard(book) {
     meta.append(words, trophy());
   } else if (pos && pos.total) {
     const pct = Math.min(99, Math.round(((pos.index + 1) / pos.total) * 100));
-    meta.append([words, `${pct}% read`].filter(Boolean).join(" · "));
+    // Saved position is the start of the current page, so 0 means still on the first page.
+    const onFirstPage = !pos.index && !pos.word;
+    meta.append([words, onFirstPage ? "" : `${pct}% read`].filter(Boolean).join(" · "));
   } else {
     meta.append(words);
   }
