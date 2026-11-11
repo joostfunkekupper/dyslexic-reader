@@ -6,7 +6,7 @@ A simple book reader that uses the [OpenDyslexic](https://opendyslexic.org/) fon
 - Adjust text size, line spacing and how many sentences appear per page.
 - Light, dark and automatic themes.
 - Your place in each book is remembered in your browser.
-- Use the arrow keys or swipe to turn pages.
+- Use the arrow keys or the page buttons to turn pages.
 
 ## Adding a book
 

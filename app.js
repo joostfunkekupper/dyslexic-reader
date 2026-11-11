@@ -498,16 +498,6 @@ async function renderReader(slug) {
   };
   document.addEventListener("keydown", readerKeyHandler);
 
-  // Swipe left/right on touch screens.
-  let touchX = null;
-  pageEl.addEventListener("touchstart", (e) => { touchX = e.touches[0].clientX; }, { passive: true });
-  pageEl.addEventListener("touchend", (e) => {
-    if (touchX === null) return;
-    const dx = e.changedTouches[0].clientX - touchX;
-    touchX = null;
-    if (Math.abs(dx) > 60) go(dx < 0 ? 1 : -1);
-  });
-
   onSppChange = () => draw();
   settingsBtn.hidden = false;
 
